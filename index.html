@@ -66,12 +66,16 @@ nav.scrolled{padding:14px 48px;border-bottom-color:var(--line-soft)}
 .nav-cta{
   background:var(--ink);color:var(--white) !important;
   padding:11px 22px;font-size:12px !important;font-weight:500 !important;letter-spacing:.1em !important;
-  display:flex;align-items:center;gap:8px;
+  display:inline-flex !important;align-items:center;gap:8px;
   border-radius:100px;
   transition:transform .3s,box-shadow .3s;
+  white-space:nowrap;
 }
 .nav-cta::after{display:none !important}
+.nav-cta::before{display:none !important}
 .nav-cta:hover{transform:translateY(-2px);box-shadow:0 12px 24px -8px rgba(10,10,10,.3)}
+.nav-cta .cta-arrow{font-size:14px;line-height:1;transition:transform .3s}
+.nav-cta:hover .cta-arrow{transform:translateX(3px)}
 @media (max-width:1100px){
   nav{padding:14px 20px}
   nav.scrolled{padding:10px 20px}
@@ -246,6 +250,9 @@ nav.scrolled{padding:14px 48px;border-bottom-color:var(--line-soft)}
 .problem-check-icon{width:40px;height:40px;border:1.5px solid var(--ink);border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:16px}
 .problem-check-text{font-family:var(--serif);font-weight:500;font-size:18px;letter-spacing:.02em}
 .problem-check-tag{font-family:var(--mono);font-size:10px;color:var(--ink-dim);letter-spacing:.15em;padding:4px 10px;border:1px solid var(--line);border-radius:100px}
+.problem-conclusion-section{padding:80px 0;border-top:1px solid var(--line);background:var(--white)}
+.problem-conclusion-section .problem-conclusion{padding:80px 48px}
+.solution-highlight{font-family:var(--display);font-style:italic;font-weight:400;display:inline-block;padding:0 8px;background:var(--white);color:var(--ink);margin:0 4px;border-radius:8px}
 .problem-conclusion{background:var(--ink);color:var(--white);padding:64px 48px;text-align:center;position:relative;overflow:hidden;border-radius:24px}
 .problem-conclusion::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle at 30% 30%, rgba(255,255,255,.04) 0%, transparent 40%),radial-gradient(circle at 70% 70%, rgba(255,255,255,.04) 0%, transparent 40%)}
 .problem-conclusion-tag{font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.7);letter-spacing:.18em;margin-bottom:24px;position:relative;z-index:2}
@@ -445,16 +452,24 @@ nav.scrolled{padding:14px 48px;border-bottom-color:var(--line-soft)}
 @media (max-width:700px){.clients-grid{grid-template-columns:repeat(3,1fr)}}
 @media (max-width:500px){.clients-grid{grid-template-columns:repeat(2,1fr)}}
 .client{background:var(--white);aspect-ratio:1;display:grid;place-items:center;padding:20px;font-family:var(--serif);font-weight:500;font-size:14px;letter-spacing:.04em;color:var(--ink);text-align:center;line-height:1.3;transition:all .35s cubic-bezier(.25,.1,.25,1);position:relative;overflow:hidden}
-.client::before{content:'';position:absolute;inset:0;background:var(--ink);transform:scale(0);transition:transform .35s cubic-bezier(.65,.05,.36,1);border-radius:50%}
-.client:hover::before{transform:scale(2.5)}
+.client::before{content:'';position:absolute;inset:0;background:var(--ink);opacity:0;transition:opacity .35s ease}
+.client:hover::before{opacity:1}
 .client > *{position:relative;z-index:2;transition:color .35s ease}
 .client:hover{color:var(--white)}
 .client-en{font-family:var(--display);font-weight:500;font-size:18px;letter-spacing:-.01em}
 .client small{display:block;font-size:9px;color:var(--ink-dim);font-family:var(--mono);font-weight:400;margin-top:6px;letter-spacing:.1em;transition:color .35s ease}
 .client:hover small{color:rgba(255,255,255,.55)}
 .client-logo{padding:24px}
-.client-logo img{width:100%;height:100%;object-fit:contain;display:block;transition:filter .35s}
+.client-logo img{width:100%;height:100%;object-fit:contain;display:block}
 .client-logo:hover img{filter:brightness(0) invert(1)}
+/* 沒有 logo 的客戶 — 用品牌名稱卡片 */
+.client-text{flex-direction:column;justify-content:center;gap:4px;padding:16px}
+.client-text .ct-zh{font-family:var(--serif);font-weight:700;font-size:18px;letter-spacing:.05em;color:var(--ink);line-height:1.1;transition:color .35s ease}
+.client-text .ct-en{font-family:var(--serif);font-weight:500;font-size:13px;color:var(--ink-dim);line-height:1.2;transition:color .35s ease;margin-bottom:8px}
+.client-text small{font-family:var(--mono);font-size:9px;color:var(--ink-dim);letter-spacing:.15em;margin-top:0;transition:color .35s ease}
+.client-text:hover .ct-zh{color:var(--white)}
+.client-text:hover .ct-en{color:rgba(255,255,255,.65)}
+.client-text:hover small{color:rgba(255,255,255,.55)}
 
 /* ========== PROCESS ========== */
 .process{padding:140px 0;border-top:1px solid var(--line);background:var(--white-soft)}
@@ -522,6 +537,8 @@ nav.scrolled{padding:14px 48px;border-bottom-color:var(--line-soft)}
 .cta-final-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px),linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);background-size:60px 60px;mask-image:radial-gradient(ellipse 80% 70% at 50% 50%, #000 30%, transparent 90%);-webkit-mask-image:radial-gradient(ellipse 80% 70% at 50% 50%, #000 30%, transparent 90%);pointer-events:none;animation:gridDrift 30s linear infinite}
 .cta-tag{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--white);margin-bottom:32px;padding:8px 20px;border:1px solid var(--white);border-radius:100px;display:inline-block}
 .cta-final h2{font-family:var(--serif);font-weight:700;font-size:clamp(48px,8vw,128px);line-height:1.05;letter-spacing:-.01em;margin-bottom:32px;position:relative;z-index:2}
+.cta-final h2.cta-h2-small{font-size:clamp(32px,4.5vw,56px);line-height:1.2;letter-spacing:-.005em;max-width:880px;margin-left:auto;margin-right:auto}
+.cta-final h2.cta-h2-small .plus{font-family:var(--display);font-style:italic;font-weight:400;color:var(--white);background:transparent;padding:0 4px;border:1px solid rgba(255,255,255,.4);border-radius:6px;font-size:.85em;display:inline-block;vertical-align:1px;margin:0 2px}
 .cta-final h2 .it{font-family:var(--display);font-style:italic;font-weight:400}
 .cta-final-tagline{font-family:var(--display);font-style:italic;font-weight:400;font-size:clamp(20px,2.5vw,32px);margin-bottom:24px;position:relative;z-index:2}
 .cta-final-tagline .zh{font-family:var(--serif);font-style:normal;font-weight:500;display:block;color:var(--white);font-size:.85em;margin-top:8px;letter-spacing:.1em}
@@ -582,7 +599,7 @@ footer{padding:80px 0 40px;background:var(--ink);color:var(--white);border-top:1
     <li><a href="#stats">成效</a></li>
     <li><a href="#services">服務</a></li>
     <li><a href="#works">案例</a></li>
-    <li><a href="#cta" class="nav-cta">免費諮詢 →</a></li>
+    <li><a href="#cta" class="nav-cta"><span>免費諮詢</span><span class="cta-arrow">→</span></a></li>
   </ul>
 </nav>
 
@@ -796,11 +813,6 @@ footer{padding:80px 0 40px;background:var(--ink);color:var(--white);border-top:1
       </div>
     </div>
 
-    <div class="problem-conclusion reveal">
-      <div class="problem-conclusion-tag">— THE SOLUTION</div>
-      <h3>用一個人的薪水，<br>請到一支電商團隊。</h3>
-      <div class="problem-conclusion-sub">One Salary. One Full Team.</div>
-    </div>
   </div>
 </section>
 
@@ -1115,65 +1127,6 @@ footer{padding:80px 0 40px;background:var(--ink);color:var(--white);border-top:1
   </div>
 </section>
 
-<!-- ========== CAMPAIGNS ========== -->
-<section class="campaigns">
-  <div class="wrap">
-    <div class="campaigns-header reveal">
-      <div class="tag">— BRAND CAMPAIGNS · 品牌素材</div>
-      <h2>
-        <span class="it">Visual works.</span><br>
-        我們親手打造的<br>品牌視覺與廣告。
-      </h2>
-      <p>
-        每一張素材都是策略的延伸 —— 不只是好看，更要讓對的人按下購買鍵。
-      </p>
-    </div>
-
-    <div class="campaigns-grid reveal">
-      <div class="campaign-tile campaign-1">
-        <div class="campaign-tile-tag">BRAND IDENTITY</div>
-        <img src="images/ad-stuck.png" alt="無二電商廣告 - 業績卡住了嗎">
-      </div>
-      <div class="campaign-tile campaign-2">
-        <div class="campaign-tile-tag">SOCIAL CAMPAIGN</div>
-        <img src="images/ad-grow.png" alt="無二電商廣告 - 業績沒成長">
-      </div>
-      <div class="campaign-tile campaign-3">
-        <div class="campaign-tile-tag">EDITORIAL</div>
-        <img src="images/ad-clean.png" alt="無二電商廣告 - 你的品牌">
-      </div>
-      <div class="campaign-tile campaign-4">
-        <div class="campaign-tile-tag">TAGLINE</div>
-        <img src="images/ad-tagline.png" alt="無二電商廣告 - 找馥鴻">
-      </div>
-      <div class="campaign-tile campaign-5">
-        <div class="campaign-tile-tag">PORTRAIT</div>
-        <img src="images/hero-fuhan.png" alt="韓馥鴻品牌形象">
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ========== PLATFORMS SHOWCASE ========== -->
-<section class="platforms-showcase">
-  <div class="wrap">
-    <div class="platforms-showcase-header reveal">
-      <div class="tag">— ONE-STOP OPERATION</div>
-      <h2>
-        <span class="it">Three platforms,</span><br>
-        一站操盤。
-      </h2>
-      <p>
-        官網、蝦皮、momo —— 三大主戰場一起進攻，不是分開做、互相打架，<br>
-        而是讓每個通路彼此互相加乘。
-      </p>
-    </div>
-    <div class="platforms-showcase-image reveal">
-      <img src="images/mockup-screens.png" alt="官網 × 蝦皮 × momo 三平台展示">
-    </div>
-  </div>
-</section>
-
 <!-- ========== CLIENTS ========== -->
 <section class="clients">
   <div class="wrap">
@@ -1199,18 +1152,18 @@ footer{padding:80px 0 40px;background:var(--ink);color:var(--white);border-top:1
       <div class="client client-logo"><img src="images/clients/08.jpg" alt="bianco di puro"></div>
       <div class="client client-logo"><img src="images/clients/02.jpg" alt="Market Go"></div>
       <div class="client client-logo"><img src="images/clients/12.jpg" alt="好創行銷"></div>
-      <div class="client">劉姥姥花椒油<small>FOOD</small></div>
-      <div class="client">阿蘭肉粽<small>FOOD</small></div>
-      <div class="client">老食說<small>FOOD</small></div>
-      <div class="client">女子餃子<small>DUMPLING</small></div>
-      <div class="client">小胡子牛仔褲<small>FASHION</small></div>
-      <div class="client">不叄國際<small>不二創立</small></div>
-      <div class="client">十本初壹<small>BRAND</small></div>
-      <div class="client">段家泰國蝦<small>FOOD</small></div>
-      <div class="client">奈森克林<small>琴觀</small></div>
-      <div class="client">植敘聚果坊<small>FOOD</small></div>
-      <div class="client">韓鮮生<small>FOOD</small></div>
-      <div class="client">靜靜國際電商<small>EC</small></div>
+      <div class="client client-text"><div class="ct-zh">劉姥姥</div><div class="ct-en">花椒油</div><small>FOOD</small></div>
+      <div class="client client-text"><div class="ct-zh">阿蘭</div><div class="ct-en">肉粽</div><small>FOOD</small></div>
+      <div class="client client-text"><div class="ct-zh">老食說</div><div class="ct-en">LAOSHISHUO</div><small>FOOD</small></div>
+      <div class="client client-text"><div class="ct-zh">女子餃子</div><div class="ct-en">JIAOZI</div><small>DUMPLING</small></div>
+      <div class="client client-text"><div class="ct-zh">小胡子</div><div class="ct-en">牛仔褲</div><small>FASHION</small></div>
+      <div class="client client-text"><div class="ct-zh">不叄</div><div class="ct-en">INTL.</div><small>BRAND</small></div>
+      <div class="client client-text"><div class="ct-zh">十本</div><div class="ct-en">初壹</div><small>BRAND</small></div>
+      <div class="client client-text"><div class="ct-zh">段家</div><div class="ct-en">泰國蝦</div><small>FOOD</small></div>
+      <div class="client client-text"><div class="ct-zh">奈森</div><div class="ct-en">克林</div><small>BRAND</small></div>
+      <div class="client client-text"><div class="ct-zh">植敘</div><div class="ct-en">聚果坊</div><small>FOOD</small></div>
+      <div class="client client-text"><div class="ct-zh">韓鮮生</div><div class="ct-en">HANXIANSHENG</div><small>FOOD</small></div>
+      <div class="client client-text"><div class="ct-zh">靜靜</div><div class="ct-en">國際電商</div><small>EC</small></div>
     </div>
   </div>
 </section>
@@ -1258,6 +1211,17 @@ footer{padding:80px 0 40px;background:var(--ink);color:var(--white);border-top:1
   </div>
 </section>
 
+<!-- ========== ONE SALARY ONE TEAM (橋接) ========== -->
+<section class="problem-conclusion-section">
+  <div class="wrap">
+    <div class="problem-conclusion reveal">
+      <div class="problem-conclusion-tag">— THE SOLUTION · 解法</div>
+      <h3>用一個人的薪水，<br>請到一支<span class="solution-highlight">完整電商團隊</span>。</h3>
+      <div class="problem-conclusion-sub">One Salary. One Full Team.</div>
+    </div>
+  </div>
+</section>
+
 <!-- ========== TEAM ========== -->
 <section class="team">
   <div class="wrap">
@@ -1274,10 +1238,10 @@ footer{padding:80px 0 40px;background:var(--ink);color:var(--white);border-top:1
 
     <div class="team-grid reveal">
       <div class="member"><div class="member-portrait">F</div><div class="member-name">韓馥鴻</div><div class="member-name-en">Fu Han</div><div class="member-role">FOUNDER · CEO</div><div class="member-skills"><span>電商營運</span><span>品牌行銷</span><span>廣告投放</span></div></div>
-      <div class="member"><div class="member-portrait">K</div><div class="member-name">陳邦閣</div><div class="member-name-en">Kenneth</div><div class="member-role">GROWTH MANAGER</div><div class="member-skills"><span>SEO 操作</span><span>數據分析</span><span>網頁規劃</span></div></div>
-      <div class="member"><div class="member-portrait">A</div><div class="member-name">Aylee Lin</div><div class="member-name-en">— PR</div><div class="member-role">PR MANAGER</div><div class="member-skills"><span>口碑經營</span><span>公關經營</span><span>KOC / KOL</span></div></div>
-      <div class="member"><div class="member-portrait">K</div><div class="member-name">KiKi Shih</div><div class="member-name-en">— Design</div><div class="member-role">DESIGN DIRECTOR</div><div class="member-skills"><span>品牌設計</span><span>平面設計</span><span>手繪插圖</span></div></div>
-      <div class="member"><div class="member-portrait">H</div><div class="member-name">黃浩震</div><div class="member-name-en">Horizon</div><div class="member-role">BUSINESS MANAGER</div><div class="member-skills"><span>商務開發</span><span>客戶服務</span><span>業務規劃</span></div></div>
+      <div class="member"><div class="member-portrait">N</div><div class="member-name">任靜宜</div><div class="member-name-en">Nonie</div><div class="member-role">COO · 營運長</div><div class="member-skills"><span>電商操盤</span><span>通路佈局</span><span>銷售規劃</span></div></div>
+      <div class="member"><div class="member-portrait">王</div><div class="member-name">王佳卉</div><div class="member-name-en">— PR</div><div class="member-role">PR MANAGER · 公關營運</div><div class="member-skills"><span>口碑經營</span><span>公關經營</span><span>KOC / KOL</span></div></div>
+      <div class="member"><div class="member-portrait">K</div><div class="member-name">KiKi Shih</div><div class="member-name-en">— Design</div><div class="member-role">DESIGN DIRECTOR · 設計總監</div><div class="member-skills"><span>品牌設計</span><span>平面設計</span><span>手繪插圖</span></div></div>
+      <div class="member"><div class="member-portrait">H</div><div class="member-name">黃浩震</div><div class="member-name-en">Horizon</div><div class="member-role">BUSINESS MANAGER · 商務經理</div><div class="member-skills"><span>商務開發</span><span>客戶服務</span><span>業務規劃</span></div></div>
     </div>
   </div>
 </section>
@@ -1326,8 +1290,8 @@ footer{padding:80px 0 40px;background:var(--ink);color:var(--white);border-top:1
   <div class="wrap">
     <div class="reveal">
       <div class="cta-tag">— FREE 30-MIN CONSULTATION</div>
-      <h2>
-        留言『電商』+1，<br>
+      <h2 class="cta-h2-small">
+        留言「電商」<span class="plus">+1</span>，<br>
         我幫你看看<span class="it">品牌卡在哪</span>。
       </h2>
       <div class="cta-final-tagline">
