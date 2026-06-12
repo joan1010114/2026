@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#030308">
+<title>靜靜國際電商｜3D 沉浸式官網</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cyan:#3EE6FF;
+  --orange:#FF7A45;
+  --pink:#FF4FA3;
+  --gold:#FFD166;
+  --ink:#fff;
+  --dim:rgba(255,255,255,.68);
+  --faint:rgba(255,255,255,.42);
+  --line:rgba(255,255,255,.14);
+  --mono:"IBM Plex Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{background:#030308}
+body{
+  background:#030308;color:var(--ink);
+  font-family:"Noto Sans TC",sans-serif;
+  line-height:1.85;letter-spacing:.03em;
+  overflow-x:hidden;
+}
+::selection{background:var(--cyan);color:#030308}
+a{color:inherit;text-decoration:none}
+
+/* ===== 3D 場景：固定全幅 ===== */
+#scene{position:fixed;inset:0;z-index:0}
+#vignette{position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:radial-gradient(ellipse 90% 80% at 50% 50%,transparent 55%,rgba(0,0,0,.65))}
+
+/* ===== Loading ===== */
+#loader{
+  position:fixed;inset:0;z-index:200;background:#030308;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;
+  transition:opacity .8s,visibility .8s;
+}
+#loader.done{opacity:0;visibility:hidden}
+.ld-logo{font-weight:900;font-size:1.3rem;letter-spacing:.5em;text-indent:.5em}
+.ld-bar{width:min(70vw,340px);height:2px;background:rgba(255,255,255,.12);border-radius:99px;overflow:hidden}
+.ld-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--pink),var(--gold));transition:width .25s}
+.ld-pct{font-family:var(--mono);font-size:.72rem;letter-spacing:.3em;color:var(--faint)}
+.ld-hint{font-size:.72rem;color:var(--faint);letter-spacing:.2em}
+
+/* ===== HUD ===== */
+#hud{
+  position:fixed;top:0;left:0;right:0;z-index:80;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:16px 5vw;
+  background:linear-gradient(rgba(3,3,8,.7),transparent);
+}
+.logo{font-weight:900;font-size:1.05rem;letter-spacing:.14em;display:flex;align-items:center;gap:10px}
+.logo i{font-style:normal;font-family:var(--mono);font-size:.62rem;color:var(--cyan);border:1px solid rgba(62,230,255,.4);padding:2px 8px;border-radius:99px;letter-spacing:.18em}
+.hud-cta{
+  font-family:var(--mono);font-size:.72rem;font-weight:700;letter-spacing:.1em;
+  border:1px solid var(--cyan);color:var(--cyan);
+  padding:9px 18px;border-radius:99px;
+  backdrop-filter:blur(8px);background:rgba(62,230,255,.08);
+  transition:all .3s;
+}
+.hud-cta:hover{background:var(--cyan);color:#030308;box-shadow:0 0 30px rgba(62,230,255,.6)}
+
+/* 航程指示器 */
+#waypoints{
+  position:fixed;right:18px;top:50%;transform:translateY(-50%);z-index:80;
+  display:flex;flex-direction:column;gap:16px;
+}
+#waypoints a{display:block;width:9px;height:9px;border-radius:50%;border:1px solid var(--faint);transition:all .35s;position:relative}
+#waypoints a.on{background:var(--cyan);border-color:var(--cyan);box-shadow:0 0 14px var(--cyan);transform:scale(1.3)}
+@media(max-width:760px){#waypoints{right:10px;gap:13px}#waypoints a{width:7px;height:7px}}
+
+/* ===== 內容層 ===== */
+main{position:relative;z-index:10}
+.panel{
+  min-height:100svh;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:110px 6vw;
+  position:relative;
+}
+.tag{
+  font-family:var(--mono);font-size:.7rem;letter-spacing:.34em;color:var(--cyan);
+  margin-bottom:20px;display:flex;align-items:center;gap:12px;
+}
+.tag::before{content:"";width:30px;height:1px;background:var(--cyan);box-shadow:0 0 8px var(--cyan)}
+h1{
+  font-weight:900;font-size:clamp(2.5rem,8.4vw,5.8rem);
+  line-height:1.25;letter-spacing:.04em;
+  text-shadow:0 0 60px rgba(62,230,255,.3);
+}
+h2{font-weight:900;font-size:clamp(1.8rem,5vw,3.2rem);line-height:1.35;letter-spacing:.05em;margin-bottom:16px;text-shadow:0 0 40px rgba(0,0,0,.8)}
+.glow-c{color:var(--cyan);text-shadow:0 0 24px rgba(62,230,255,.8)}
+.glow-p{color:var(--pink);text-shadow:0 0 24px rgba(255,79,163,.8)}
+.glow-g{color:var(--gold);text-shadow:0 0 24px rgba(255,209,102,.8)}
+.lead{color:var(--dim);max-width:30em;font-size:clamp(.92rem,1.5vw,1.08rem);text-shadow:0 2px 18px rgba(0,0,0,.9)}
+.lead b{color:#fff}
+
+/* hero */
+#p-hero{align-items:flex-start;text-align:left}
+.hero-meta{
+  margin-top:46px;display:flex;gap:34px;flex-wrap:wrap;
+  font-family:var(--mono);
+}
+.hm b{font-size:clamp(1.4rem,3vw,2rem);font-weight:700;display:block;font-variant-numeric:tabular-nums}
+.hm span{font-size:.68rem;letter-spacing:.18em;color:var(--faint)}
+.scroll-cue{
+  position:absolute;bottom:34px;left:50%;transform:translateX(-50%);
+  font-family:var(--mono);font-size:.66rem;letter-spacing:.4em;color:var(--faint);
+  text-align:center;animation:cue 2.4s ease infinite;
+}
+.scroll-cue::after{content:"";display:block;width:1px;height:42px;margin:10px auto 0;background:linear-gradient(var(--cyan),transparent)}
+@keyframes cue{0%,100%{opacity:.5;transform:translateX(-50%) translateY(0)}50%{opacity:1;transform:translateX(-50%) translateY(8px)}}
+
+/* glass 卡片 */
+.glass{
+  border:1px solid var(--line);border-radius:20px;
+  background:rgba(8,10,22,.55);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  padding:30px 28px;
+  transition:transform .35s,border-color .35s,box-shadow .35s;
+}
+.glass:hover{transform:translateY(-6px)}
+.row{display:grid;gap:18px;margin-top:44px}
+.row.c3{grid-template-columns:repeat(3,1fr)}
+.row.c4{grid-template-columns:repeat(4,1fr)}
+@media(max-width:900px){.row.c3,.row.c4{grid-template-columns:1fr}.row.c4{grid-template-columns:1fr 1fr}}
+@media(max-width:540px){.row.c4{grid-template-columns:1fr 1fr;gap:12px}}
+
+/* 通路卡 */
+.chan h3{font-size:1.3rem;font-weight:900;letter-spacing:.08em;margin-bottom:4px}
+.chan .en{font-family:var(--mono);font-size:.64rem;letter-spacing:.22em;color:var(--faint);margin-bottom:16px}
+.chan p{font-size:.86rem;color:var(--dim);margin-bottom:16px}
+.chan ul{list-style:none;font-size:.8rem;color:var(--dim)}
+.chan li{padding:7px 0;border-top:1px solid var(--line);display:flex;gap:10px;align-items:center}
+.chan li::before{content:"▸";font-size:.7rem}
+.chan.cy{--c:var(--cyan)}.chan.or{--c:var(--orange)}.chan.pk{--c:var(--pink)}
+.chan li::before{color:var(--c)}
+.chan:hover{border-color:var(--c);box-shadow:0 0 40px rgba(62,230,255,.12),inset 0 0 30px rgba(255,255,255,.02)}
+.chan h3 b{color:var(--c)}
+
+/* 數字 */
+.stat{text-align:left}
+.stat b{
+  font-family:var(--mono);font-weight:700;
+  font-size:clamp(1.9rem,4.6vw,3rem);line-height:1.1;display:block;
+  font-variant-numeric:tabular-nums;
+}
+.stat b i{font-style:normal;font-size:.5em;margin-left:.1em}
+.stat span{font-size:.76rem;color:var(--dim);display:block;margin-top:8px;letter-spacing:.08em}
+.stat:nth-child(1) b i{color:var(--gold)}.stat:nth-child(2) b i{color:var(--cyan)}
+.stat:nth-child(3) b i{color:var(--pink)}.stat:nth-child(4) b i{color:var(--orange)}
+.note{font-size:.7rem;color:var(--faint);margin-top:20px;letter-spacing:.06em}
+
+/* 服務 */
+.sv .ico{font-size:1.5rem;display:block;margin-bottom:10px}
+.sv h3{font-size:.98rem;font-weight:700;letter-spacing:.1em;margin-bottom:6px}
+.sv p{font-size:.8rem;color:var(--dim)}
+.sv:hover{border-color:var(--cyan)}
+
+/* CTA */
+#p-cta{text-align:center;align-items:center}
+.btn-main{
+  display:inline-block;margin-top:40px;
+  font-weight:900;font-size:1.02rem;letter-spacing:.14em;
+  padding:19px 52px;border-radius:99px;
+  background:linear-gradient(92deg,var(--cyan),var(--pink) 60%,var(--gold));
+  background-size:200% 100%;color:#06060D;
+  animation:gshift 4.5s linear infinite;
+  box-shadow:0 0 50px rgba(62,230,255,.4);
+  transition:transform .25s,box-shadow .25s;
+}
+@keyframes gshift{to{background-position:200% 0}}
+.btn-main:hover{transform:translateY(-3px) scale(1.04);box-shadow:0 0 80px rgba(255,79,163,.55)}
+.btn-main:active{transform:scale(.95)}
+.cta-sub{margin-top:22px;font-size:.78rem;color:var(--faint)}
+.cta-sub b{color:var(--gold);font-weight:700}
+
+footer{
+  position:relative;z-index:10;
+  padding:30px 6vw;border-top:1px solid var(--line);
+  background:rgba(3,3,8,.8);backdrop-filter:blur(10px);
+  display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;
+  font-size:.7rem;color:var(--faint);letter-spacing:.1em;
+}
+
+/* reveal */
+.rv{opacity:0;transform:translateY(36px);transition:opacity .8s,transform .8s cubic-bezier(.2,.85,.25,1)}
+.rv.in{opacity:1;transform:none}
+.d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .rv{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<div id="loader">
+  <div class="ld-logo">靜靜國際電商</div>
+  <div class="ld-bar"><i id="ldFill"></i></div>
+  <div class="ld-pct" id="ldPct">0%</div>
+  <div class="ld-hint">正在啟動訂單宇宙引擎…</div>
+</div>
+
+<canvas id="scene"></canvas>
+<div id="vignette"></div>
+
+<div id="hud">
+  <a class="logo" href="#p-hero">靜靜國際電商 <i>3D OPS</i></a>
+  <a class="hud-cta" href="#p-cta">免費營運健檢</a>
+</div>
+
+<div id="waypoints">
+  <a href="#p-hero" data-wp="0" aria-label="首頁"></a>
+  <a href="#p-chan" data-wp="1" aria-label="通路"></a>
+  <a href="#p-stat" data-wp="2" aria-label="實績"></a>
+  <a href="#p-svc" data-wp="3" aria-label="服務"></a>
+  <a href="#p-cta" data-wp="4" aria-label="聯絡"></a>
+</div>
+
+<main id="main">
+
+  <section class="panel" id="p-hero">
+    <div class="tag rv">ORDER UNIVERSE — JINGJING E-COMMERCE</div>
+    <h1 class="rv d1">每一顆光點，<br>都是一張<span class="glow-c">成交的訂單</span>。</h1>
+    <p class="lead rv d2" style="margin-top:26px">眼前的粒子流，來自<b>官網、蝦皮、Momo</b> 三條航道，正源源不絕匯入靜靜的營運核心。<b>往下滑，跟著鏡頭飛進去看。</b></p>
+    <div class="hero-meta rv d3">
+      <div class="hm"><b data-count="1.2" data-dec="1">0</b><span>億+ 代操 GMV</span></div>
+      <div class="hm"><b data-count="5.2" data-dec="1">0</b><span>x 平均 ROAS</span></div>
+      <div class="hm"><b data-count="30">0</b><span>+ 合作品牌</span></div>
+    </div>
+    <div class="scroll-cue">DIVE IN</div>
+  </section>
+
+  <section class="panel" id="p-chan">
+    <div class="tag rv">CH.01 — THREE LANES 三條航道</div>
+    <h2 class="rv">三大通路，<span class="glow-c">三</span><span class="glow-p">色</span><span class="glow-g">航</span>道</h2>
+    <p class="lead rv d1">場景裡的三色粒子流就是它們。每條航道的演算法與檔期節奏都不同——我們派懂規則的人，打懂規則的仗。</p>
+    <div class="row c3">
+      <div class="glass chan cy rv d1">
+        <h3><b>●</b> 品牌官網</h3><div class="en">BRAND SITE — CYAN LANE</div>
+        <p>SHOPLINE、CYBERBIZ 建置與長期營運，把流量變成自己的資產。</p>
+        <ul><li>網站視覺與轉換優化</li><li>Meta / Google 廣告</li><li>會員分眾再行銷</li></ul>
+      </div>
+      <div class="glass chan or rv d2">
+        <h3><b>●</b> 蝦皮購物</h3><div class="en">SHOPEE — ORANGE LANE</div>
+        <p>從關鍵字排名、站內廣告到雙 11 衝刺，紅利吃好吃滿。</p>
+        <ul><li>關鍵字與排名優化</li><li>站內廣告操盤</li><li>大檔期活動規劃</li></ul>
+      </div>
+      <div class="glass chan pk rv d3">
+        <h3><b>●</b> Momo 購物網</h3><div class="en">MOMO — PINK LANE</div>
+        <p>台灣最大通路的上架談判與檔期合作，顧好每一分毛利。</p>
+        <ul><li>上架申請與談判</li><li>選品定價策略</li><li>主題檔期・庫存協作</li></ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="p-stat">
+    <div class="tag rv">CH.02 — WARP SPEED 實績</div>
+    <h2 class="rv">現在的速度，<br>叫做<span class="glow-g">業績成長中</span></h2>
+    <p class="lead rv d1">你正在穿越的粒子隧道，是我們替客戶跑出來的成績。</p>
+    <div class="row c4">
+      <div class="glass stat rv"><b><span data-count="1.2" data-dec="1">0</span><i>億+</i></b><span>累積代操 GMV（NT$）</span></div>
+      <div class="glass stat rv d1"><b><span data-count="5.2" data-dec="1">0</span><i>x</i></b><span>平均廣告投報 ROAS</span></div>
+      <div class="glass stat rv d2"><b><span data-count="300">0</span><i>%↑</i></b><span>單一品牌年成長紀錄</span></div>
+      <div class="glass stat rv d3"><b><span data-count="30">0</span><i>+</i></b><span>跨品類品牌實戰</span></div>
+    </div>
+    <div class="note rv d3">＊示意數字，上線前替換為實際成績。</div>
+  </section>
+
+  <section class="panel" id="p-svc">
+    <div class="tag rv">CH.03 — MISSION CONTROL 任務中心</div>
+    <h2 class="rv">出貨和客服留給你，<br><span class="glow-c">其他我們全包</span></h2>
+    <div class="row c3">
+      <div class="glass sv rv"><span class="ico">🗓️</span><h3>商品與檔期管理</h3><p>上架、文案、主圖、全年行銷日曆一次排到位。</p></div>
+      <div class="glass sv rv d1"><span class="ico">🎯</span><h3>廣告投放操盤</h3><p>Meta、Google、蝦皮廣告，每日盯盤、每週覆盤。</p></div>
+      <div class="glass sv rv d2"><span class="ico">🔁</span><h3>會員經營與再行銷</h3><p>分眾名單、EDM 與廣告再行銷，把一次客變回頭客。</p></div>
+      <div class="glass sv rv"><span class="ico">📊</span><h3>數據儀表板</h3><p>即時看板＋每月報告，每分預算去向都清楚。</p></div>
+      <div class="glass sv rv d1"><span class="ico">🤝</span><h3>KOL 與團購串接</h3><p>網紅開團、團媽合作，打開更多成交場景。</p></div>
+      <div class="glass sv rv d2"><span class="ico">🧭</span><h3>整合行銷策略</h3><p>定位、通路組合、預算配置，想清楚再開打。</p></div>
+    </div>
+    <div class="note rv d3">＊商品出貨與第一線客服由品牌方負責，我們會把訂單與顧客數據整理好交到你手上。</div>
+  </section>
+
+  <section class="panel" id="p-cta">
+    <div class="tag rv" style="justify-content:center">CH.04 — DOCKING 對接</div>
+    <h2 class="rv">準備好把你的品牌<br><span class="glow-c">送進這個宇宙</span>了嗎？</h2>
+    <p class="lead rv d1" style="margin:0 auto">留下品牌資訊，我們先免費做一份通路營運健檢，告訴你業績還有多少成長空間。不綁長約，用成績說話。</p>
+    <a class="btn-main rv d2" href="mailto:hello@example.com?subject=預約免費營運健檢">預約免費營運健檢 →</a>
+    <p class="cta-sub rv d3">或加 LINE 官方帳號 <b>@jingjing</b>（請替換為實際聯絡方式）</p>
+  </section>
+
+</main>
+
+<footer>
+  <span>靜靜國際電商有限公司</span>
+  <span>KAOHSIUNG, TAIWAN © 2026 JINGJING INTERNATIONAL E-COMMERCE</span>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const reduced=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const isMobile=innerWidth<760;
+
+/* ============ Loading（含 webgl fallback） ============ */
+const loader=document.getElementById("loader"),ldFill=document.getElementById("ldFill"),ldPct=document.getElementById("ldPct");
+let ldP=0;
+const ldT=setInterval(()=>{
+  ldP=Math.min(ldP+Math.random()*22,96);
+  ldFill.style.width=ldP+"%";ldPct.textContent=Math.round(ldP)+"%";
+},120);
+function finishLoad(){
+  clearInterval(ldT);ldFill.style.width="100%";ldPct.textContent="100%";
+  setTimeout(()=>loader.classList.add("done"),350);
+}
+
+/* ============ THREE 場景 ============ */
+let three_ok=false;
+try{
+if(typeof THREE!=="undefined"){
+three_ok=true;
+const canvas=document.getElementById("scene");
+const renderer=new THREE.WebGLRenderer({canvas,antialias:!isMobile,alpha:false});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.setSize(innerWidth,innerHeight);
+renderer.setClearColor(0x030308);
+
+const scene=new THREE.Scene();
+scene.fog=new THREE.FogExp2(0x030308,0.016);
+const camera=new THREE.PerspectiveCamera(62,innerWidth/innerHeight,.1,400);
+
+/* ---- 顏色 ---- */
+const C_CYAN=new THREE.Color(0x3EE6FF),C_ORANGE=new THREE.Color(0xFF7A45),
+      C_PINK=new THREE.Color(0xFF4FA3),C_GOLD=new THREE.Color(0xFFD166);
+
+/* ---- 中央核心：發光二十面體 ---- */
+const core=new THREE.Group();
+const coreGeo=new THREE.IcosahedronGeometry(4,1);
+const coreMat=new THREE.MeshStandardMaterial({color:0x0B1030,emissive:0x3EE6FF,emissiveIntensity:.35,metalness:.85,roughness:.25,flatShading:true});
+const coreMesh=new THREE.Mesh(coreGeo,coreMat);
+core.add(coreMesh);
+const wire=new THREE.Mesh(new THREE.IcosahedronGeometry(5.2,1),
+  new THREE.MeshBasicMaterial({color:0x3EE6FF,wireframe:true,transparent:true,opacity:.28}));
+core.add(wire);
+/* 光暈 sprite */
+const glowCv=document.createElement("canvas");glowCv.width=glowCv.height=256;
+const gctx=glowCv.getContext("2d");
+const gg=gctx.createRadialGradient(128,128,0,128,128,128);
+gg.addColorStop(0,"rgba(120,220,255,.9)");gg.addColorStop(.35,"rgba(80,140,255,.35)");gg.addColorStop(1,"rgba(0,0,0,0)");
+gctx.fillStyle=gg;gctx.fillRect(0,0,256,256);
+const glowTex=new THREE.CanvasTexture(glowCv);
+const glow=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false}));
+glow.scale.set(26,26,1);core.add(glow);
+/* 三個軌道環 */
+[[C_CYAN,8.5,0],[C_ORANGE,11,Math.PI/3],[C_PINK,13.5,-Math.PI/4]].forEach(([col,r,tilt])=>{
+  const ring=new THREE.Mesh(new THREE.TorusGeometry(r,.06,8,90),
+    new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:.5}));
+  ring.rotation.x=Math.PI/2+tilt*.3;ring.rotation.y=tilt;
+  ring.userData.spin=.0016*(Math.random()>.5?1:-1);
+  core.add(ring);
+});
+scene.add(core);
+
+/* ---- 三條粒子航道（螺旋流入核心） ---- */
+const LANES=[
+  {col:C_CYAN, start:new THREE.Vector3(-70,18,-50), phase:0},
+  {col:C_ORANGE,start:new THREE.Vector3(75,-8,-60), phase:2.1},
+  {col:C_PINK, start:new THREE.Vector3(-15,-30,-90),phase:4.2},
+];
+const PER=isMobile?420:900;
+const laneObjs=LANES.map(l=>{
+  const n=PER,pos=new Float32Array(n*3),prog=new Float32Array(n),seed=new Float32Array(n);
+  for(let i=0;i<n;i++){prog[i]=Math.random();seed[i]=Math.random()*6.28}
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute("position",new THREE.BufferAttribute(pos,3));
+  const mat=new THREE.PointsMaterial({color:l.col,size:isMobile?.5:.42,transparent:true,opacity:.95,blending:THREE.AdditiveBlending,depthWrite:false,sizeAttenuation:true});
+  const pts=new THREE.Points(geo,mat);
+  scene.add(pts);
+  return {...l,pts,prog,seed,n};
+});
+function laneUpdate(t){
+  laneObjs.forEach(L=>{
+    const p=L.pts.geometry.attributes.position.array;
+    for(let i=0;i<L.n;i++){
+      L.prog[i]+= .0016+(L.prog[i]*.004); /* 越接近核心越快 */
+      if(L.prog[i]>1)L.prog[i]=0;
+      const k=L.prog[i];
+      const sw=1-k; /* swirl 半徑收斂 */
+      const ang=L.phase+k*9+L.seed[i];
+      const x=L.start.x*(1-k)+Math.cos(ang)*14*sw;
+      const y=L.start.y*(1-k)+Math.sin(ang*1.4+L.seed[i])*9*sw;
+      const z=L.start.z*(1-k)+Math.sin(ang)*14*sw;
+      p[i*3]=x;p[i*3+1]=y;p[i*3+2]=z;
+    }
+    L.pts.geometry.attributes.position.needsUpdate=true;
+  });
+}
+
+/* ---- 曲速隧道（環繞鏡頭航線的粒子柱） ---- */
+const TN=isMobile?700:1500;
+const tGeo=new THREE.BufferGeometry();
+const tPos=new Float32Array(TN*3),tCol=new Float32Array(TN*3);
+for(let i=0;i<TN;i++){
+  const a=Math.random()*6.28,r=6+Math.random()*22,z=-40-Math.random()*160;
+  tPos[i*3]=Math.cos(a)*r;tPos[i*3+1]=Math.sin(a)*r;tPos[i*3+2]=z;
+  const c=[C_CYAN,C_PINK,C_GOLD,C_ORANGE][i%4];
+  tCol[i*3]=c.r;tCol[i*3+1]=c.g;tCol[i*3+2]=c.b;
+}
+tGeo.setAttribute("position",new THREE.BufferAttribute(tPos,3));
+tGeo.setAttribute("color",new THREE.BufferAttribute(tCol,3));
+const tunnel=new THREE.Points(tGeo,new THREE.PointsMaterial({size:.55,vertexColors:true,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false}));
+scene.add(tunnel);
+
+/* ---- 星空 ---- */
+const SN=isMobile?500:1100;
+const sGeo=new THREE.BufferGeometry();
+const sPos=new Float32Array(SN*3);
+for(let i=0;i<SN;i++){
+  sPos[i*3]=(Math.random()-.5)*320;sPos[i*3+1]=(Math.random()-.5)*320;sPos[i*3+2]=(Math.random()-.5)*320;
+}
+sGeo.setAttribute("position",new THREE.BufferAttribute(sPos,3));
+scene.add(new THREE.Points(sGeo,new THREE.PointsMaterial({color:0x99AACC,size:.3,transparent:true,opacity:.7})));
+
+/* ---- 光 ---- */
+scene.add(new THREE.AmbientLight(0x223355,.9));
+const pl1=new THREE.PointLight(0x3EE6FF,1.4,120);pl1.position.set(20,16,20);scene.add(pl1);
+const pl2=new THREE.PointLight(0xFF4FA3,1.1,120);pl2.position.set(-22,-10,14);scene.add(pl2);
+
+/* ---- 鏡頭航線（依滾動 keyframes） ---- */
+const KEYS=[
+  {pos:[0,3,42],   look:[0,0,0],  fog:.014},  /* hero：遠觀核心 */
+  {pos:[16,8,20],  look:[0,0,0],  fog:.018},  /* 通路：側飛貼近 */
+  {pos:[0,0,-30],  look:[0,0,-120],fog:.010}, /* 實績：衝進隧道 */
+  {pos:[-14,-6,14],look:[0,0,0],  fog:.02},   /* 服務：繞背面 */
+  {pos:[0,2,26],   look:[0,0,0],  fog:.014},  /* CTA：回望核心 */
+];
+const cam={pos:new THREE.Vector3(0,3,42),look:new THREE.Vector3(0,0,0)};
+let scrollProg=0;
+function camTarget(){
+  const segs=KEYS.length-1;
+  const f=Math.min(Math.max(scrollProg,0),1)*segs;
+  const i=Math.min(Math.floor(f),segs-1),k=f-i;
+  const e=k*k*(3-2*k); /* smoothstep */
+  const A=KEYS[i],B=KEYS[i+1];
+  const tp=new THREE.Vector3().fromArray(A.pos).lerp(new THREE.Vector3().fromArray(B.pos),e);
+  const tl=new THREE.Vector3().fromArray(A.look).lerp(new THREE.Vector3().fromArray(B.look),e);
+  const fog=A.fog+(B.fog-A.fog)*e;
+  /* 隧道透明度：第 2→3 段亮起 */
+  const warp=Math.max(0,1-Math.abs(f-2)*1.4);
+  return{tp,tl,fog,warp};
+}
+
+/* ---- 指標視差 ---- */
+const ptr={x:0,y:0};
+addEventListener("pointermove",e=>{ptr.x=e.clientX/innerWidth-.5;ptr.y=e.clientY/innerHeight-.5},{passive:true});
+addEventListener("touchmove",e=>{ptr.x=e.touches[0].clientX/innerWidth-.5;ptr.y=e.touches[0].clientY/innerHeight-.5},{passive:true});
+
+/* ---- loop ---- */
+let firstFrame=false;
+const clock=new THREE.Clock();
+function loop(){
+  const t=clock.getElapsedTime();
+  if(!reduced){
+    laneUpdate(t);
+    coreMesh.rotation.y=t*.25;coreMesh.rotation.x=Math.sin(t*.3)*.2;
+    wire.rotation.y=-t*.18;wire.rotation.z=t*.1;
+    core.children.forEach(ch=>{if(ch.userData.spin)ch.rotation.z+=ch.userData.spin});
+    glow.material.opacity=.8+Math.sin(t*2.2)*.15;
+    tunnel.rotation.z=t*.05;
+    const tp2=tunnel.geometry.attributes.position.array;
+    for(let i=0;i<TN;i++){tp2[i*3+2]+=1.6;if(tp2[i*3+2]>20)tp2[i*3+2]=-180}
+    tunnel.geometry.attributes.position.needsUpdate=true;
+  }
+  const T=camTarget();
+  cam.pos.lerp(T.tp,reduced?1:.06);
+  cam.look.lerp(T.tl,reduced?1:.06);
+  camera.position.copy(cam.pos);
+  camera.position.x+=ptr.x*3;camera.position.y-=ptr.y*2;
+  camera.lookAt(cam.look);
+  scene.fog.density+= (T.fog-scene.fog.density)*.05;
+  tunnel.material.opacity+=(T.warp*.95-tunnel.material.opacity)*.07;
+  renderer.render(scene,camera);
+  if(!firstFrame){firstFrame=true;finishLoad()}
+  requestAnimationFrame(loop);
+}
+loop();
+
+addEventListener("resize",()=>{
+  camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth,innerHeight);
+});
+
+/* ---- scroll → progress ---- */
+addEventListener("scroll",()=>{
+  const h=document.documentElement;
+  scrollProg=h.scrollTop/(h.scrollHeight-h.clientHeight);
+},{passive:true});
+}
+}catch(e){console.warn("3D init failed",e)}
+if(!three_ok){ /* WebGL 失敗 fallback：純 CSS 漸層背景 */
+  document.getElementById("scene").style.background=
+    "radial-gradient(ellipse at 30% 20%,rgba(62,230,255,.15),transparent 60%),radial-gradient(ellipse at 75% 70%,rgba(255,79,163,.13),transparent 60%),#030308";
+  finishLoad();
+}
+setTimeout(finishLoad,5000); /* 保險：最多 5 秒一定進場 */
+
+/* ============ Reveal + 數字 ============ */
+function countUp(el){
+  if(el.dataset.done)return;el.dataset.done=1;
+  const target=parseFloat(el.dataset.count),dec=+(el.dataset.dec||0);
+  if(reduced){el.textContent=target.toFixed(dec);return}
+  const t0=performance.now(),dur=1500;
+  (function f(now){const t=Math.min((now-t0)/dur,1),e=1-Math.pow(1-t,4);
+    el.textContent=(target*e).toFixed(dec);
+    if(t<1)requestAnimationFrame(f)})(t0);
+}
+const io=new IntersectionObserver(es=>es.forEach(e=>{
+  if(!e.isIntersecting)return;
+  e.target.classList.add("in");
+  e.target.querySelectorAll("[data-count]").forEach(countUp);
+  io.unobserve(e.target);
+}),{threshold:.18});
+document.querySelectorAll(".rv").forEach(el=>io.observe(el));
+
+/* ============ 航點指示器 ============ */
+const panels=[...document.querySelectorAll(".panel")];
+const wps=[...document.querySelectorAll("#waypoints a")];
+const pio=new IntersectionObserver(es=>es.forEach(e=>{
+  if(!e.isIntersecting)return;
+  const i=panels.indexOf(e.target);
+  wps.forEach((w,j)=>w.classList.toggle("on",i===j));
+}),{threshold:.5});
+panels.forEach(p=>pio.observe(p));
+</script>
+</body>
+</html>
